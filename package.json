@@ -19,6 +19,7 @@
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.23.0",
     "react-skinview3d": "^5.0.3",
+    "styled-components": "^6.1.10",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

@@ -1,9 +1,7 @@
-import React from "react";
-
 import { FaBars } from "react-icons/fa";
 import { NavLink as Link } from "react-router-dom";
 import styled from "styled-components";
-import ImportProfil from "../Components/ImportProfil/ImportProfil";
+import ImportProfil from "@/components/ImportProfil/ImportProfil";
 
 export const Nav = styled.nav`
   background: #ff5c00;
@@ -78,9 +76,7 @@ const Navbar = () => {
           PalaAnimation Trainer
         </NavLink>
         <ImportProfil
-          resetButton={false}
-          logError={false}
-          idPseudoInput={"pseudoInputNavBar"}
+          showResetButton={false}
         />
         <NavLink to="/about" activestyle="true">
           About
