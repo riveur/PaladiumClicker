@@ -9,7 +9,7 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="relative min-h-screen flex flex-col">
-      <header className="h-16 w-full bg-primary text-primary-foreground sticky top-0 z-10 border-b border-primary-200 backdrop-blur-md">
+      <header className="h-16 w-full bg-background/90 sticky top-0 z-10 border-b backdrop-blur-md">
         <Navbar />
       </header>
       <main className="flex-1 container py-4 pb-16 mx-auto">
