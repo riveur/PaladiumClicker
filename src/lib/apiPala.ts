@@ -16,7 +16,7 @@ import {
   PaladiumClickerData,
   PaladiumFactionInfo,
   PaladiumFactionLeaderboard,
-  PaladiumFriendInfo,
+  PaladiumFriendInfo, PaladiumJobs,
   PaladiumPlayerInfo,
   PaladiumRanking,
   PlayerInfo,
@@ -26,7 +26,7 @@ import {
 import axios from "axios";
 import { usePlayerInfoStore } from "@/stores/use-player-info-store.ts";
 
-const PALADIUM_API_URL = "https://api.paladium.games/";
+const PALADIUM_API_URL = "https://palatracker.bromine.fr/";
 
 const fetchLocal = async <T>(file: string) => {
   const result = await axios<T>(import.meta.env.BASE_URL + file, {
@@ -62,12 +62,26 @@ const getPaladiumProfileByPseudo = async (pseudo: string): Promise<PaladiumPlaye
   return response.data;
 }
 
+const getPlayerJobFromUUID = async (uuid: string): Promise<PaladiumJobs> => {
+  return axios.get<PaladiumJobs>(`${PALADIUM_API_URL}/v1/paladium/player/profile/${uuid}/jobs`, {
+    timeout: 4000
+  }).then((response) => {
+    if (response.status !== 200) {
+      throw response;
+    }
+
+    return response.data;
+  });
+}
+
 export const getPaladiumLeaderboardPositionByUUID = async (uuid: string): Promise<string> => {
 // set a timeout of 2 seconds to avoid blocking the main thread for too long
   const response = await axios.get<PaladiumRanking>(`${PALADIUM_API_URL}/v1/paladium/ranking/position/clicker/${uuid}`, {
     timeout: 4000
   }).catch((error) => error);
 
+  if(response.data.type === "AUTHORIZATION_ERROR")
+    return "Unranked"
   if (response instanceof Error) {
     if ((response as NetworkError).code === "ECONNABORTED") {
       throw "Timeout error of \"Get player positions in a specific leaderboard\" API, please try again later";
@@ -85,10 +99,6 @@ const getPaladiumClickerDataByUUID = async (uuid: string): Promise<PaladiumClick
   const response = await axios.get<PaladiumClickerData>(`${PALADIUM_API_URL}/v1/paladium/player/profile/${uuid}/clicker`, {
     timeout: 4000
   }).catch((error) => error);
-
-  axios.get<PaladiumClickerData>(`https://palatracker.bromine.fr/v1/paladium/player/profile/${uuid}/clicker`, {
-    timeout: 4000
-  })
 
   if (response instanceof Error) {
     if ((response as NetworkError).code === "ECONNABORTED") {
@@ -202,6 +212,7 @@ export const getPlayerInfo = async (pseudo: string): Promise<PlayerInfo> => {
 
   const paladiumProfil = await getPaladiumProfileByPseudo(pseudo);
   const { buildings, upgrades } = await getPaladiumClickerDataByUUID(paladiumProfil.uuid);
+  paladiumProfil.jobs = await getPlayerJobFromUUID(paladiumProfil.uuid);
 
   const translateBuildingName = await fetchLocal<Record<string, number>>("/translate_building.json");
   const translateBuildingUpgradeName = await fetchLocal<
